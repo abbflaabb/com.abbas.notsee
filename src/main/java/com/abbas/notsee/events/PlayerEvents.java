@@ -1,9 +1,7 @@
 package com.abbas.notsee.events;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,20 +16,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PlayerEvents implements Listener {
-
     private final JavaPlugin plugin;
     private final Map<UUID, Long> lastLoginTimes = new HashMap<>();
-    private final FileConfiguration config;
-
-    // Messages configuration with defaults
-    private String welcomeMessage;
-    private String welcomeBackMessage;
-    private String goodbyeMessage;
-    private String silentQuitMessage;
-    private String adminJoinMessage;
-    private String vipJoinMessage;
-
-    // Sound configuration
+    private final Map<String, MessageInfo> messages = new HashMap<>();
     private Sound joinSound;
     private Sound quitSound;
     private float volume;
@@ -39,37 +26,59 @@ public class PlayerEvents implements Listener {
 
     public PlayerEvents(JavaPlugin plugin) {
         this.plugin = plugin;
-        this.config = plugin.getConfig();
         loadConfiguration();
     }
 
     private void loadConfiguration() {
-        // Load messages from config or use defaults
-        welcomeMessage = ChatColor.translateAlternateColorCodes('&',
-                config.getString("messages.welcome", "&a&lWelcome, &e{player} &a&lto the server!"));
-        welcomeBackMessage = ChatColor.translateAlternateColorCodes('&',
-                config.getString("messages.welcome-back", "&a&lWelcome back, &e{player}&a&l!"));
-        goodbyeMessage = ChatColor.translateAlternateColorCodes('&',
-                config.getString("messages.goodbye", "&c&lGoodbye, &e{player}&c&l!"));
-        silentQuitMessage = ChatColor.translateAlternateColorCodes('&',
-                config.getString("messages.silent-quit", "&7{player} has left silently."));
-        adminJoinMessage = ChatColor.translateAlternateColorCodes('&',
-                config.getString("messages.admin-join", "&4&lAdmin &e{player} &4&lhas joined."));
-        vipJoinMessage = ChatColor.translateAlternateColorCodes('&',
-                config.getString("messages.vip-join", "&6&lVIP &e{player} &6&lhas joined."));
+        // Load messages with permissions
+        addMessage("welcome", "&a&lWelcome, &e{player} &a&lto the server!", "notsee.messages.welcome");
+        addMessage("welcome-back", "&a&lWelcome back, &e{player}&a&l!", "notsee.messages.welcome-back");
+        addMessage("goodbye", "&c&lGoodbye, &e{player}&c&l!", "notsee.messages.goodbye");
+        addMessage("silent-quit", "&7{player} has left silently.", "notsee.messages.silentquit");
+        addMessage("admin-join", "&4&lAdmin &e{player} &4&lhas joined.", "notsee.messages.admin");
+        addMessage("vip-join", "&6&lVIP &e{player} &6&lhas joined.", "notsee.messages.vip");
+        addMessage("staff-notify", "&7[Staff] {player} has joined the server.", "notsee.messages.staff");
 
-        // Load sound configuration
+        // Load sounds
+        ConfigurationSection soundSection = plugin.getConfig().getConfigurationSection("sounds");
+        if (soundSection == null) {
+            soundSection = plugin.getConfig().createSection("sounds");
+        }
+
         try {
-            joinSound = Sound.valueOf(config.getString("sounds.join", "ENDERMAN_TELEPORT"));
-            quitSound = Sound.valueOf(config.getString("sounds.quit", "ENDERMAN_TELEPORT"));
+            joinSound = Sound.valueOf(soundSection.getString("join", "ENDERMAN_TELEPORT"));
+            quitSound = Sound.valueOf(soundSection.getString("quit", "ENDERMAN_TELEPORT"));
         } catch (IllegalArgumentException e) {
             plugin.getLogger().warning("Invalid sound in config, using defaults.");
             joinSound = Sound.ENDERMAN_TELEPORT;
             quitSound = Sound.ENDERMAN_TELEPORT;
         }
 
-        volume = (float) config.getDouble("sounds.volume", 1.0);
-        pitch = (float) config.getDouble("sounds.pitch", 1.0);
+        volume = (float) soundSection.getDouble("volume", 1.0);
+        pitch = (float) soundSection.getDouble("pitch", 1.0);
+
+        plugin.saveConfig();
+    }
+
+    private void addMessage(String key, String defaultText, String permission) {
+        ConfigurationSection msgSection = plugin.getConfig().getConfigurationSection("messages");
+        if (msgSection == null) {
+            msgSection = plugin.getConfig().createSection("messages");
+        }
+
+        ConfigurationSection section = msgSection.getConfigurationSection(key);
+        if (section == null) {
+            section = msgSection.createSection(key);
+        }
+
+        section.addDefault("text", defaultText);
+        section.addDefault("permission", permission);
+
+        String text = ChatColor.translateAlternateColorCodes('&',
+                section.getString("text", defaultText));
+        String perm = section.getString("permission", permission);
+
+        messages.put(key, new MessageInfo(text, perm));
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -77,150 +86,107 @@ public class PlayerEvents implements Listener {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
 
-        // Welcome the player with different messages based on circumstances
-        if (player.hasPermission("notsee.admin")) {
-            // Admin join message
-            String message = adminJoinMessage.replace("{player}", player.getName());
-            event.setJoinMessage(message);
-
-            // Notify other admins silently
-            for (Player online : Bukkit.getOnlinePlayers()) {
-                if (online.hasPermission("notsee.admin") && !online.equals(player)) {
-                    online.sendMessage(ChatColor.GRAY + "[Staff] " + player.getName() + " has joined the server.");
-                }
-            }
-        } else if (player.hasPermission("notsee.vip")) {
-            // VIP join message
-            String message = vipJoinMessage.replace("{player}", player.getName());
-            event.setJoinMessage(message);
+        // Handle join messages based on permissions
+        if (player.hasPermission(messages.get("admin-join").permission)) {
+            event.setJoinMessage(formatMessage("admin-join", player));
+            broadcastToPermitted("staff-notify", player);
+        } else if (player.hasPermission(messages.get("vip-join").permission)) {
+            event.setJoinMessage(formatMessage("vip-join", player));
         } else {
-            // Regular player messaging logic with first join detection
             if (player.hasPlayedBefore() && lastLoginTimes.containsKey(playerUUID)) {
-                String message = welcomeBackMessage.replace("{player}", player.getName());
-                event.setJoinMessage(message);
+                event.setJoinMessage(formatMessage("welcome-back", player));
             } else {
-                String message = welcomeMessage.replace("{player}", player.getName());
-                event.setJoinMessage(message);
-
-                // First time join bonus
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        player.sendMessage(ChatColor.GREEN + "Welcome to our server! Here's a quick guide:");
-                        player.sendMessage(ChatColor.YELLOW + "- Type /help for commands");
-                        player.sendMessage(ChatColor.YELLOW + "- Visit our website for more info");
-                        player.sendMessage(ChatColor.YELLOW + "- Have fun playing!");
-                    }
-                }.runTaskLater(plugin, 60L); // 3 seconds delay
+                event.setJoinMessage(formatMessage("welcome", player));
+                sendFirstJoinMessage(player);
             }
         }
 
-        // Play sound to the player
-        player.playSound(player.getLocation(), joinSound, volume, pitch);
-
-        // Play sound to nearby players
-        for (Player nearby : player.getWorld().getPlayers()) {
-            if (nearby.getLocation().distance(player.getLocation()) <= 30 && !nearby.equals(player)) {
-                nearby.playSound(nearby.getLocation(), joinSound, volume * 0.5f, pitch);
-            }
-        }
-
-        // Update login time
+        playJoinSounds(player);
         lastLoginTimes.put(playerUUID, System.currentTimeMillis());
-
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        // Set the quit message based on player status
-        if (player.hasPermission("notsee.silentquit") || player.isFlying()) {
-            // Silent quit for staff or flying players
-            if (config.getBoolean("show-silent-quit-to-admins", true)) {
-                String message = silentQuitMessage.replace("{player}", player.getName());
-                for (Player admin : Bukkit.getOnlinePlayers()) {
-                    if (admin.hasPermission("notsee.admin")) {
-                        admin.sendMessage(message);
-                    }
-                }
-            }
+        if (player.hasPermission(messages.get("silent-quit").permission) || player.isFlying()) {
+            broadcastToPermitted("silent-quit", player);
             event.setQuitMessage(null);
         } else {
-            // Normal quit message
-            String message = goodbyeMessage.replace("{player}", player.getName());
-            event.setQuitMessage(message);
+            event.setQuitMessage(formatMessage("goodbye", player));
         }
 
-        // Play sound to nearby players
-        for (Player nearby : player.getWorld().getPlayers()) {
-            if (nearby.getLocation().distance(player.getLocation()) <= 30 && !nearby.equals(player)) {
-                nearby.playSound(nearby.getLocation(), quitSound, volume, pitch);
+        playQuitSounds(player);
+        saveLogoutLocation(player);
+    }
+
+    private void broadcastToPermitted(String messageKey, Player player) {
+        MessageInfo info = messages.get(messageKey);
+        String message = formatMessage(messageKey, player);
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.hasPermission(info.permission) && !online.equals(player)) {
+                online.sendMessage(message);
             }
         }
+    }
 
-        // Save player's last location for potential teleport-back feature
-        if (config.getBoolean("save-logout-location", true)) {
-            String locationStr = player.getLocation().getWorld().getName() + "," +
-                    player.getLocation().getX() + "," +
-                    player.getLocation().getY() + "," +
-                    player.getLocation().getZ();
+    private String formatMessage(String key, Player player) {
+        return messages.get(key).text.replace("{player}", player.getName());
+    }
+
+    private void sendFirstJoinMessage(Player player) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.sendMessage(ChatColor.GREEN + "Welcome to our server! Here's a quick guide:");
+                player.sendMessage(ChatColor.YELLOW + "- Type /help for commands");
+                player.sendMessage(ChatColor.YELLOW + "- Visit our website for more info");
+                player.sendMessage(ChatColor.YELLOW + "- Have fun playing!");
+            }
+        }.runTaskLater(plugin, 60L);
+    }
+
+    private void playJoinSounds(Player player) {
+        player.playSound(player.getLocation(), joinSound, volume, pitch);
+        playSoundToNearbyPlayers(player, joinSound);
+    }
+
+    private void playQuitSounds(Player player) {
+        player.playSound(player.getLocation(), quitSound, volume, pitch);
+        playSoundToNearbyPlayers(player, quitSound);
+    }
+
+    private void playSoundToNearbyPlayers(Player source, Sound sound) {
+        for (Player nearby : source.getWorld().getPlayers()) {
+            if (nearby.getLocation().distance(source.getLocation()) <= 30 && !nearby.equals(source)) {
+                nearby.playSound(nearby.getLocation(), sound, volume * 0.5f, pitch);
+            }
+        }
+    }
+
+    private void saveLogoutLocation(Player player) {
+        if (plugin.getConfig().getBoolean("save-logout-location", true)) {
+            Location loc = player.getLocation();
+            String locationStr = String.format("%s,%f,%f,%f",
+                    loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ());
             plugin.getConfig().set("player-data." + player.getUniqueId() + ".last-location", locationStr);
             plugin.saveConfig();
         }
-
-        // Clean up resources
-        player.playSound(player.getLocation(), quitSound, volume, pitch);
     }
 
-    // Method to get time since last login
-    public String getTimeSinceLastLogin(Player player) {
-        UUID playerUUID = player.getUniqueId();
-        if (!lastLoginTimes.containsKey(playerUUID)) {
-            return "First login";
+    private static class MessageInfo {
+        final String text;
+        final String permission;
+
+        MessageInfo(String text, String permission) {
+            this.text = text;
+            this.permission = permission;
         }
-
-        long lastLogin = lastLoginTimes.get(playerUUID);
-        long currentTime = System.currentTimeMillis();
-        long diffInMillis = currentTime - lastLogin;
-
-        // Convert to appropriate time unit
-        long seconds = diffInMillis / 1000;
-        if (seconds < 60) {
-            return seconds + " seconds ago";
-        }
-
-        long minutes = seconds / 60;
-        if (minutes < 60) {
-            return minutes + " minutes ago";
-        }
-
-        long hours = minutes / 60;
-        if (hours < 24) {
-            return hours + " hours ago";
-        }
-
-        long days = hours / 24;
-        return days + " days ago";
     }
 
-    // Additional utility methods
     public void reloadConfiguration() {
         plugin.reloadConfig();
-        this.loadConfiguration();
-    }
-
-    public void broadcastAdminJoin(Player admin, boolean silent) {
-        if (silent) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.hasPermission("notsee.admin")) {
-                    player.sendMessage(ChatColor.DARK_RED + "[Silent] " +
-                            ChatColor.YELLOW + admin.getName() +
-                            ChatColor.DARK_RED + " has joined silently.");
-                }
-            }
-        } else {
-            Bukkit.broadcastMessage(adminJoinMessage.replace("{player}", admin.getName()));
-        }
+        loadConfiguration();
     }
 }
