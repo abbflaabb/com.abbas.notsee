@@ -1,0 +1,22 @@
+name: NotSee
+version: '${project.version}'
+main: com.abbas.notsee.core.NotSee
+
+
+commands:
+  help:
+    description: Shows the help menu
+    usage: /help
+    aliases: [h]
+  support:
+    description: Shows the support menu
+    usage: /support
+    aliases: [s]
+permissions:
+  notsee.mehelp:
+    description: Allows players to use the help command
+    default: true
+  notsee.mehelp.reload:
+    description: Allows players to reload the plugin
+    default: op
+
