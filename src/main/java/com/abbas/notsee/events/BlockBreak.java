@@ -17,7 +17,8 @@ public class BlockBreak implements Listener {
     public void onS(BlockBreakEvent event) {
         event.setCancelled(true);
         Player p = event.getPlayer();
-        p.sendMessage(ChatColor.RED + "You cannot break blocks here!" +  ChatColor.YELLOW + "If you need help, please contact a staff member." +  ChatColor.GOLD + plugin.getName() + " " + ChatColor.GRAY + "v" + plugin.getDescription().getVersion() + " by andrei1058");
+        p.sendMessage(ChatColor.RED + "You cannot break blocks here!" + ChatColor.GRAY + " | "
+                +  ChatColor.GOLD + plugin.getName() + " " + ChatColor.GRAY + "v" + plugin.getDescription().getVersion() + " by Cala");
         if (p.hasPermission("notsee.breakblocks")) {
             event.setCancelled(false);}
 
