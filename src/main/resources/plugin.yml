@@ -8,10 +8,6 @@ commands:
     description: Shows the help menu
     usage: /help
     aliases: [h]
-  support:
-    description: Shows the support menu
-    usage: /support
-    aliases: [s]
 permissions:
   notsee.mehelp:
     description: Allows players to use the help command
