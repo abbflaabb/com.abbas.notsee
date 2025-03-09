@@ -3,7 +3,6 @@ package com.abbas.notsee.core;
 import com.abbas.notsee.TestConfig.Config;
 import com.abbas.notsee.commands.MeHelpTestCommand;
 import com.abbas.notsee.events.BlockBreak;
-import com.abbas.notsee.events.PlayerEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -48,7 +47,6 @@ public final class NotSee extends JavaPlugin {
     private void registerEvents() {
         // Register your events here
         PluginManager p = Bukkit.getPluginManager();
-        p.registerEvents(new PlayerEvents(this), this);
         p.registerEvents(new BlockBreak(this),this);
     }
 
