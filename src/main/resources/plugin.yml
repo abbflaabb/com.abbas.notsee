@@ -15,34 +15,6 @@ permissions:
   notsee.mehelp.reload:
     description: Allows players to reload the plugin
     default: op
-  notsee.messages.*:
-    description: Access to all message permissions
-    children:
-      notsee.messages.welcome: true
-      notsee.messages.welcome-back: true
-      notsee.messages.goodbye: true
-      notsee.messages.silentquit: true
-      notsee.messages.admin: true
-      notsee.messages.vip: true
-      notsee.messages.staff: true
-  notsee.messages.welcome:
-    description: See welcome messages
-    default: true
-  notsee.messages.welcome-back:
-    description: See welcome back messages
-    default: true
-  notsee.messages.goodbye:
-    description: See goodbye messages
-    default: true
-  notsee.messages.silentquit:
-    description: Use silent quit feature
-    default: op
-  notsee.messages.admin:
-    description: Use admin join messages
-    default: op
-  notsee.messages.vip:
-    description: Use VIP join messages
+  notsee.breakblocks:
+    description: Allows players to break blocks
     default: false
-  notsee.messages.staff:
-    description: See staff notifications
-    default: op
