@@ -18,6 +18,7 @@ public class MeHelpTestCommand implements CommandExecutor {
 
     private final Map<String, CommandInfo> commands = new HashMap<>();
     private final JavaPlugin plugin;
+    private String YoutubeCommand;
 
     public MeHelpTestCommand(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -61,10 +62,8 @@ public class MeHelpTestCommand implements CommandExecutor {
         addDefaultCommand(commandsSection, "bw map", "/bw map", "ITALIC", "Displays the name of the map", true);
         addDefaultCommand(commandsSection, "sping", "/Sping", "DARK_BLUE", "Show your ping", true);
         addDefaultCommand(commandsSection, "sstats", "/SStats", "GOLD", "Show your stats", true);
-        addDefaultCommand(commandsSection, "bwheal", "/bwheal", "DARK_RED", "Heals you in BedWars", true);
-        addDefaultCommand(commandsSection, "bwdiscord", "/bwdiscord", "DARK_GREEN", "Displays the Discord link", true);
-        addDefaultCommand(commandsSection, "bwmenu", "/bwmenu", "DARK_AQUA", "Opens the BedWars menu", true);
-
+        addDefaultCommand(commandsSection, "bwsmenu", "/bwmenu", "DARK_AQUA", "Opens the BedWars menu", true);
+        addDefaultCommand(commandsSection, "Youtube", "/Youtube", "DARK_PURPLE", "SubScribe to my channel", true);
         // Create settings section for customization
         ConfigurationSection settingsSection = Config.getConfig().createSection("settings");
         settingsSection.set("helpTitle", "BedWars Help");
@@ -136,6 +135,7 @@ public class MeHelpTestCommand implements CommandExecutor {
         }
         return false;
     }
+
 
     private void displayHelp(Player player, String[] args) {
         // Filter commands based on args if provided
