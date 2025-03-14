@@ -2,9 +2,15 @@ package com.abbas.notsee.core;
 
 import com.abbas.notsee.TestConfig.Config;
 import com.abbas.notsee.commands.MeHelpTestCommand;
-import com.abbas.notsee.events.BlockBreak;
+import com.abbas.notsee.commands.YoutubeCommand;
+import com.abbas.notsee.commands.ticktok;
+import com.abbas.notsee.events.DropItem;
+import com.abbas.notsee.listeners.JoinListener;
+import com.abbas.notsee.listeners.KillListener;
+import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
@@ -19,11 +25,16 @@ public final class NotSee extends JavaPlugin {
         // Additional startup tasks can be performed here
         initializeCommands();
         registerEvents();
+        // Initialize config
 
-        saveDefaultConfig();
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider != null) {
+            LuckPerms api = provider.getProvider();
+        }
 
         // Setup our custom config handler
         Config.setup();
+
 
         // Optional: If you want to create a default config with predefined values
         if (!Config.getConfig().isConfigurationSection("commands")) {
@@ -31,6 +42,7 @@ public final class NotSee extends JavaPlugin {
             // The MeHelpCommand constructor will create default values when initialized
         }
     }
+
 
     @Override
     public void onDisable() {
@@ -40,14 +52,18 @@ public final class NotSee extends JavaPlugin {
     private void initializeCommands() {
         // Register your commands here
         getCommand("help").setExecutor(new MeHelpTestCommand(this));
-
+        getCommand("Youtube").setExecutor(new YoutubeCommand());
+        getCommand("ticktok").setExecutor(new ticktok());
 
     }
 
     private void registerEvents() {
         // Register your events here
         PluginManager p = Bukkit.getPluginManager();
-        p.registerEvents(new BlockBreak(this),this);
+
+        p.registerEvents(new JoinListener(),this);
+        p.registerEvents(new DropItem(), this);
+        p.registerEvents(new KillListener(), this);
     }
 
 
