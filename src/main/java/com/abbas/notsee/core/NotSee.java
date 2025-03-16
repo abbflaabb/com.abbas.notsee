@@ -1,10 +1,9 @@
 package com.abbas.notsee.core;
 
 import com.abbas.notsee.TestConfig.Config;
-import com.abbas.notsee.commands.MeHelpTestCommand;
-import com.abbas.notsee.commands.YoutubeCommand;
-import com.abbas.notsee.commands.ticktok;
+import com.abbas.notsee.commands.*;
 import com.abbas.notsee.events.DropItem;
+import com.abbas.notsee.events.Test;
 import com.abbas.notsee.listeners.JoinListener;
 import com.abbas.notsee.listeners.KillListener;
 import net.luckperms.api.LuckPerms;
@@ -54,6 +53,11 @@ public final class NotSee extends JavaPlugin {
         getCommand("help").setExecutor(new MeHelpTestCommand(this));
         getCommand("Youtube").setExecutor(new YoutubeCommand());
         getCommand("ticktok").setExecutor(new ticktok());
+        getCommand("about").setExecutor(new About()); // Register the About command
+        getCommand("discord").setExecutor(new Discord()); // Register the Discord command
+        getCommand("telegram").setExecutor(new Telegram()); // Register the telegram command
+        getCommand("store").setExecutor(new Store()); // Register the store command
+        getCommand("build").setExecutor(new Build()); // Register the Build command
 
     }
 
@@ -64,6 +68,7 @@ public final class NotSee extends JavaPlugin {
         p.registerEvents(new JoinListener(),this);
         p.registerEvents(new DropItem(), this);
         p.registerEvents(new KillListener(), this);
+        p.registerEvents(new Test(),this);
     }
 
 
