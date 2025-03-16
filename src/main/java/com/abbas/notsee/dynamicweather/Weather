@@ -1,8 +1,0 @@
-package com.abbas.notsee.dynamicweather;
-
-import org.bukkit.World;
-
-public interface Weather {
-    void apply(World world, int duration);
-    void clear(World world);
-}
