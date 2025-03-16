@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public final class NotSee extends JavaPlugin {
     private Logger logger = getLogger();
-
+    private BossListener bossListener;
     @Override
     public void onEnable() {
         logger.info("Plugin enabled");
@@ -45,6 +45,9 @@ public final class NotSee extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (bossListener != null) {
+            bossListener.cleanup();
+        }
         logger.info("Plugin disabled");
     }
 
@@ -56,7 +59,6 @@ public final class NotSee extends JavaPlugin {
         getCommand("about").setExecutor(new About()); // Register the About command
         getCommand("discord").setExecutor(new Discord()); // Register the Discord command
         getCommand("telegram").setExecutor(new Telegram()); // Register the telegram command
-        getCommand("store").setExecutor(new Store()); // Register the store command
         getCommand("build").setExecutor(new Build()); // Register the Build command
 
     }
@@ -69,6 +71,8 @@ public final class NotSee extends JavaPlugin {
         p.registerEvents(new DropItem(), this);
         p.registerEvents(new KillListener(), this);
         p.registerEvents(new Test(),this);
+        p.registerEvents(new BossListener(this), this);
+
     }
 
 
