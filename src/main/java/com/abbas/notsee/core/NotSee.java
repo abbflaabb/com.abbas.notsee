@@ -64,7 +64,6 @@ public final class NotSee extends JavaPlugin {
         getCommand("discord").setExecutor(new Discord()); // Register the Discord command
         getCommand("telegram").setExecutor(new Telegram()); // Register the telegram command
         getCommand("build").setExecutor(new Build()); // Register the Build command
-        getCommand("DWSC").setExecutor(new DynamicWeatherSetCommand());
     }
 
     private void registerEvents() {
@@ -76,7 +75,6 @@ public final class NotSee extends JavaPlugin {
         p.registerEvents(new KillListener(), this);
         p.registerEvents(new Test(),this);
         p.registerEvents(new BossListener(this), this);
-        p.registerEvents(new dynamicweather(plugin), this);
     }
 
 
