@@ -22,15 +22,9 @@ commands:
   telegram:
     description: Opens the telegram channel
     aliases: [tg]
-  store:
-    description: Opens the store
-    aliases: [shop]
   build:
     description: Opens the build server
     aliases: [bs]
-  BossReload:
-    description: Reloads the plugin
-    aliases: [br]
 permissions:
   notsee.mehelp:
     description: Allows players to use the help command
