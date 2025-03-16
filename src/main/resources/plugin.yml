@@ -6,36 +6,31 @@ main: com.abbas.notsee.core.NotSee
 commands:
   help:
     description: Shows the help menu
-    usage: /help
     aliases: [h]
   Youtube:
     description: Opens the youtube channel
-    usage: /youtube
     aliases: [yt]
   ticktok:
     description: Opens the ticktok channel
-    usage: /ticktok
     aliases: [tt]
   about:
     description: Shows the plugin information
-    usage: /about
     aliases: [info]
   discord:
     description: Opens the discord server
-    usage: /discord
     aliases: [dc]
   telegram:
     description: Opens the telegram channel
-    usage: /telegram
     aliases: [tg]
   store:
     description: Opens the store
-    usage: /store
     aliases: [shop]
   build:
     description: Opens the build server
-    usage: /build
     aliases: [bs]
+  BossReload:
+    description: Reloads the plugin
+    aliases: [br]
 permissions:
   notsee.mehelp:
     description: Allows players to use the help command
