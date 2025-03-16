@@ -25,9 +25,6 @@ commands:
   build:
     description: Opens the build server
     aliases: [bs]
-  DWSC:
-    description: DynamicWeatherSetCommand
-    aliases: [dwsc]
 permissions:
   notsee.mehelp:
     description: Allows players to use the help command
