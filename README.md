@@ -1,5 +1,3 @@
-🔹 **Description**
-This is a custom Minecraft NotSee plugin that enhances gameplay with various commands, events, and listeners. It integrates social media commands, custom utilities, and event listeners for an improved BedWars experience.
 
 🛠️ **Features**
 - **Custom Commands**: `/about`, `/build`, `/discord`, `/telegram`, `/youtube`, etc.
