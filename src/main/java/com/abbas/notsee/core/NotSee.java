@@ -1,5 +1,6 @@
 package com.abbas.notsee.core;
 
+import com.abbas.notsee.MysqlTest.DatabaseManager;
 import com.abbas.notsee.StaffCommands.Kick;
 import com.abbas.notsee.TestConfig.Config;
 import com.abbas.notsee.commands.*;
@@ -22,6 +23,10 @@ public final class NotSee extends JavaPlugin {
     @Override
     public void onEnable() {
         logger.info("Plugin enabled");
+
+        // Initialize database
+        DatabaseManager dbManager = new DatabaseManager();
+        dbManager.initialize();
 
         // Additional startup tasks can be performed here
         initializeCommands();
