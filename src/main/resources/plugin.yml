@@ -26,12 +26,19 @@ commands:
     description: Opens the build server
     aliases: [bs]
 permissions:
+  NotSee.Ban:
+    description: Allows players to ban other players
+    default: op
   notsee.mehelp:
     description: Allows players to use the help command
     default: true
   notsee.mehelp.reload:
     description: Allows players to reload the plugin
     default: op
-  notsee.breakblocks:
-    description: Allows players to break blocks
-    default: false
+  NotSee.Kick:
+    description: Allows players to kick other players
+    default: op
+
+  notsee.dropitems:
+    description: Allows players to drop items
+    default: true
