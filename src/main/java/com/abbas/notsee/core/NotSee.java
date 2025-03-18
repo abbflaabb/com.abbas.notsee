@@ -1,9 +1,8 @@
 package com.abbas.notsee.core;
 
+import com.abbas.notsee.StaffCommands.Kick;
 import com.abbas.notsee.TestConfig.Config;
 import com.abbas.notsee.commands.*;
-import com.abbas.notsee.dynamicweather.DynamicWeatherSetCommand;
-import com.abbas.notsee.dynamicweather.dynamicweather;
 import com.abbas.notsee.events.DropItem;
 import com.abbas.notsee.events.Test;
 import com.abbas.notsee.listeners.JoinListener;
@@ -18,7 +17,6 @@ import java.util.logging.Logger;
 
 public final class NotSee extends JavaPlugin {
     private Logger logger = getLogger();
-    private BossListener bossListener;
     private JavaPlugin plugin;
 
     @Override
@@ -49,9 +47,6 @@ public final class NotSee extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (bossListener != null) {
-            bossListener.cleanup();
-        }
         logger.info("Plugin disabled");
     }
 
@@ -64,6 +59,7 @@ public final class NotSee extends JavaPlugin {
         getCommand("discord").setExecutor(new Discord()); // Register the Discord command
         getCommand("telegram").setExecutor(new Telegram()); // Register the telegram command
         getCommand("build").setExecutor(new Build()); // Register the Build command
+        getCommand("Kick").setExecutor(new Kick()); // Register the Kick command
     }
 
     private void registerEvents() {
@@ -74,7 +70,6 @@ public final class NotSee extends JavaPlugin {
         p.registerEvents(new DropItem(), this);
         p.registerEvents(new KillListener(), this);
         p.registerEvents(new Test(),this);
-        p.registerEvents(new BossListener(this), this);
     }
 
 
