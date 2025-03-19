@@ -61,6 +61,9 @@ public class Kick implements CommandExecutor {
                 Config.save();
 
                 return true;
+            } else {
+                sender.sendMessage(ColorUtils.translateColorCodes("&cUsage: /kick <player> [reason]"));
+                return true;
             }
         }
         return false;
