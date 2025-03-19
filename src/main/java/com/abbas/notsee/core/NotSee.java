@@ -24,9 +24,6 @@ public final class NotSee extends JavaPlugin {
     public void onEnable() {
         logger.info("Plugin enabled");
 
-        // Initialize database
-        DatabaseManager dbManager = new DatabaseManager();
-        dbManager.initialize();
 
         // Additional startup tasks can be performed here
         initializeCommands();
