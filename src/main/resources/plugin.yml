@@ -25,6 +25,10 @@ commands:
   build:
     description: Opens the build server
     aliases: [bs]
+  ban:
+    description: Bans a player
+  kick:
+    description: Kicks a player
 permissions:
   NotSee.Ban:
     description: Allows players to ban other players
