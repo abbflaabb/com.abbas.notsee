@@ -1,6 +1,6 @@
 package com.abbas.notsee.core;
 
-import com.abbas.notsee.MysqlTest.DatabaseManager;
+import com.abbas.notsee.StaffCommands.Ban;
 import com.abbas.notsee.StaffCommands.Kick;
 import com.abbas.notsee.TestConfig.Config;
 import com.abbas.notsee.commands.*;
@@ -24,6 +24,7 @@ public final class NotSee extends JavaPlugin {
     public void onEnable() {
         logger.info("Plugin enabled");
 
+        // Initialize database
 
         // Additional startup tasks can be performed here
         initializeCommands();
@@ -62,6 +63,8 @@ public final class NotSee extends JavaPlugin {
         getCommand("telegram").setExecutor(new Telegram()); // Register the telegram command
         getCommand("build").setExecutor(new Build()); // Register the Build command
         getCommand("Kick").setExecutor(new Kick()); // Register the Kick command
+        getCommand("ban").setExecutor(new Ban());
+
     }
 
     private void registerEvents() {
